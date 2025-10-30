@@ -1,3 +1,5 @@
+data "aws_caller_identity" "current" {}
+
 resource "aws_iam_openid_connect_provider" "github" {
   url = "https://token.actions.githubusercontent.com"
 
@@ -11,6 +13,10 @@ resource "aws_iam_openid_connect_provider" "github" {
 
   tags = {
     Name = "${var.project_name}-github-oidc"
+  }
+
+  lifecycle {
+    ignore_changes = [thumbprint_list]
   }
 }
 
