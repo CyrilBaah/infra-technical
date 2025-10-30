@@ -37,6 +37,8 @@ module "ecs" {
 module "github_oidc" {
   source = "./modules/github-oidc"
 
-  project_name       = var.project_name
-  github_repository  = var.github_repository
+  project_name         = var.project_name
+  github_repository    = var.github_repository
+  create_oidc_provider = false
+  create_github_role   = false
 }

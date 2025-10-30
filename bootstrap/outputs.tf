@@ -5,7 +5,7 @@ output "s3_bucket_name" {
 
 output "github_actions_role_arn" {
   description = "ARN of the GitHub Actions IAM role"
-  value       = aws_iam_role.github_actions.arn
+  value       = local.github_role_arn
 }
 
 output "oidc_provider_arn" {

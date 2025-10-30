@@ -14,12 +14,16 @@ resource "aws_iam_openid_connect_provider" "github" {
   thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"]
 }
 
-locals {
-  oidc_provider_arn = var.create_oidc_provider ? aws_iam_openid_connect_provider.github[0].arn : data.aws_iam_openid_connect_provider.github[0].arn
+# Try to get existing IAM role
+data "aws_iam_role" "github_actions" {
+  count = var.create_github_role ? 0 : 1
+  name  = "${var.project_name}-github-actions"
 }
 
+# Create IAM role if it doesn't exist
 resource "aws_iam_role" "github_actions" {
-  name = "${var.project_name}-github-actions"
+  count = var.create_github_role ? 1 : 0
+  name  = "${var.project_name}-github-actions"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -43,9 +47,15 @@ resource "aws_iam_role" "github_actions" {
   })
 }
 
+locals {
+  oidc_provider_arn = var.create_oidc_provider ? aws_iam_openid_connect_provider.github[0].arn : data.aws_iam_openid_connect_provider.github[0].arn
+  github_role_arn   = var.create_github_role ? aws_iam_role.github_actions[0].arn : data.aws_iam_role.github_actions[0].arn
+  github_role_name  = var.create_github_role ? aws_iam_role.github_actions[0].name : data.aws_iam_role.github_actions[0].name
+}
+
 resource "aws_iam_role_policy" "github_actions" {
   name = "${var.project_name}-github-actions-policy"
-  role = aws_iam_role.github_actions.id
+  role = local.github_role_name
 
   policy = jsonencode({
     Version = "2012-10-17"
