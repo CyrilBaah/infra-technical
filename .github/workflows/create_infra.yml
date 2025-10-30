@@ -42,6 +42,9 @@ jobs:
         cd terraform
         echo "Importing existing resources if they exist..."
         
+        # Import GitHub OIDC resources
+        terraform import module.github_oidc.aws_iam_role.github_actions[0] hello-api-github-actions 2>/dev/null || echo "GitHub role not found or already imported"
+        
         # Import ECR repository
         terraform import module.ecr.aws_ecr_repository.app hello-api 2>/dev/null || echo "ECR not found or already imported"
         
