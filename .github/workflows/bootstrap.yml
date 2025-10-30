@@ -1,0 +1,49 @@
+name: Bootstrap GitHub OIDC
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "bootstrap" to create GitHub OIDC role'
+        required: true
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    if: github.event.inputs.confirm == 'bootstrap'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: ${{ secrets.TF_VERSION }}
+
+    - name: Configure AWS credentials (temporary)
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Create GitHub OIDC role only
+      run: |
+        cd terraform
+        terraform init
+        terraform apply -target=module.github_oidc -auto-approve
+
+    - name: Show GitHub OIDC role info
+      run: |
+        cd terraform
+        ROLE_ARN=$(terraform output -raw github_actions_role_arn)
+        echo "✅ GitHub OIDC role created!"
+        echo "🔑 Role ARN: ${ROLE_ARN//${{ secrets.AWS_ACCOUNT_ID }}/***MASKED***}"
+        echo ""
+        echo "⚠️  IMPORTANT: Remove AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY secrets after this step!"
+        echo "📝 Now you can use the create_infra.yml workflow with OIDC"

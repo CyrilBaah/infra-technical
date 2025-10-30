@@ -25,6 +25,12 @@ test_hello:
 	@echo "Testing hello endpoint of $(APP_NAME)..."
 	curl -f http://localhost:3000/hello || true
 
+# Generate GitHub OIDC thumbprint
+thumbprint: ## Generate GitHub OIDC provider thumbprint
+	@echo "🔐 Generating GitHub OIDC thumbprint..."
+	@echo | openssl s_client -servername token.actions.githubusercontent.com -connect token.actions.githubusercontent.com:443 2>/dev/null | openssl x509 -fingerprint -noout -sha1 | cut -d= -f2 | tr -d : | tr '[:upper:]' '[:lower:]'
+	@echo "✅ Use this thumbprint in terraform/modules/github-oidc/main.tf"
+
 # Deploy infrastructure and push image (end-to-end)
 deploy_infra:
 	@echo "🚀 Deploying infrastructure..."
@@ -47,7 +53,7 @@ destroy_infra:
 # Clean up all stopped containers and images
 clean:
 	@echo "Cleaning up Docker containers and images..."
-	@docker stop $(shell docker ps -aq) || true
-	@docker rm $(shell docker ps -aq) || true
-	@docker rmi $(shell docker images -aq) || true
+	@docker container prune -f 2>/dev/null || true
+	@docker image prune -f 2>/dev/null || true
+	@docker system prune -f 2>/dev/null || true
 	@echo "Cleanup complete!"
