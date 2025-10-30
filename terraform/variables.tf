@@ -9,3 +9,8 @@ variable "project_name" {
   type        = string
   default     = "hello-api"
 }
+
+variable "github_repository" {
+  description = "GitHub repository in format owner/repo"
+  type        = string
+}
