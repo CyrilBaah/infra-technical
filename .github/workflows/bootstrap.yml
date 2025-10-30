@@ -42,8 +42,8 @@ jobs:
       run: |
         cd terraform
         ROLE_ARN=$(terraform output -raw github_actions_role_arn)
-        echo "✅ GitHub OIDC role created!"
-        echo "🔑 Role ARN: ${ROLE_ARN//${{ secrets.AWS_ACCOUNT_ID }}/***MASKED***}"
+        echo "GitHub OIDC role created!"
+        echo "Role ARN: ${ROLE_ARN//${{ secrets.AWS_ACCOUNT_ID }}/***MASKED***}"
         echo ""
-        echo "⚠️  IMPORTANT: Remove AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY secrets after this step!"
-        echo "📝 Now you can use the create_infra.yml workflow with OIDC"
+        echo "IMPORTANT: Remove AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY secrets after this step!"
+        echo "Now you can use the create_infra.yml workflow with OIDC"

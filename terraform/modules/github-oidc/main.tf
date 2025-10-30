@@ -55,12 +55,11 @@ resource "aws_iam_role_policy" "github_actions" {
         Action = [
           "ecr:*",
           "ecs:*",
-          "ec2:DescribeSubnets",
-          "ec2:DescribeVpcs",
-          "ec2:DescribeSecurityGroups",
+          "ec2:*",
           "elasticloadbalancing:*",
           "logs:*",
-          "iam:PassRole"
+          "iam:*",
+          "application-autoscaling:*"
         ]
         Resource = "*"
       }
