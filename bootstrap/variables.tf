@@ -1,0 +1,17 @@
+variable "aws_region" {
+  description = "AWS region"
+  type        = string
+  default     = "eu-west-1"
+}
+
+variable "project_name" {
+  description = "Project name for resource naming"
+  type        = string
+  default     = "hello-api"
+}
+
+variable "github_repository" {
+  description = "GitHub repository in format owner/repo"
+  type        = string
+  default     = "*/*"
+}
