@@ -1,0 +1,60 @@
+name: Create Infrastructure
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "create" to confirm infrastructure creation'
+        required: true
+        default: ''
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  create-infra:
+    runs-on: ubuntu-latest
+    if: github.event.inputs.confirm == 'create'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: ${{ secrets.TF_VERSION }}
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.PROJECT_NAME }}-github-actions
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Terraform Init
+      run: |
+        cd terraform
+        terraform init
+
+    - name: Terraform Plan
+      run: |
+        cd terraform
+        terraform plan
+
+    - name: Terraform Apply
+      run: |
+        cd terraform
+        terraform apply -auto-approve
+
+    - name: Show infrastructure info
+      run: |
+        cd terraform
+        echo "✅ Infrastructure created successfully!"
+        LB_DNS=$(terraform output -raw load_balancer_dns)
+        ECR_URL=$(terraform output -raw ecr_repository_url)
+        ROLE_ARN=$(terraform output -raw github_actions_role_arn)
+        
+        echo "🌐 Load Balancer: http://$LB_DNS"
+        echo "📦 ECR Repository: ${ECR_URL//${{ secrets.AWS_ACCOUNT_ID }}/***MASKED***}"
+        echo "🔑 GitHub Role ARN: ${ROLE_ARN//${{ secrets.AWS_ACCOUNT_ID }}/***MASKED***}"
