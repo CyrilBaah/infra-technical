@@ -50,11 +50,11 @@ jobs:
     - name: Show infrastructure info
       run: |
         cd terraform
-        echo "✅ Infrastructure created successfully!"
+        echo "Infrastructure created successfully!"
         LB_DNS=$(terraform output -raw load_balancer_dns)
         ECR_URL=$(terraform output -raw ecr_repository_url)
         ROLE_ARN=$(terraform output -raw github_actions_role_arn)
         
-        echo "🌐 Load Balancer: http://$LB_DNS"
-        echo "📦 ECR Repository: ${ECR_URL//${{ secrets.AWS_ACCOUNT_ID }}/***MASKED***}"
-        echo "🔑 GitHub Role ARN: ${ROLE_ARN//${{ secrets.AWS_ACCOUNT_ID }}/***MASKED***}"
+        echo "Load Balancer: http://$LB_DNS"
+        echo "ECR Repository: ${ECR_URL//${{ secrets.AWS_ACCOUNT_ID }}/***MASKED***}"
+        echo "GitHub Role ARN: ${ROLE_ARN//${{ secrets.AWS_ACCOUNT_ID }}/***MASKED***}"
