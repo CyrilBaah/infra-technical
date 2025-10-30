@@ -52,9 +52,9 @@ jobs:
 
     - name: Verify ECR cleanup
       run: |
-        aws ecr describe-repositories --repository-names ${{ secrets.PROJECT_NAME }} || echo "✅ ECR repository cleaned up"
+        aws ecr describe-repositories --repository-names ${{ secrets.PROJECT_NAME }} || echo "ECR repository cleaned up"
 
     - name: Cleanup confirmation
       run: |
-        echo "🗑️ Infrastructure destroyed successfully!"
-        echo "💰 AWS resources have been cleaned up to avoid charges"
+        echo "Infrastructure destroyed successfully!"
+        echo "AWS resources have been cleaned up to avoid charges"
