@@ -1,0 +1,60 @@
+name: Destroy Infrastructure
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "destroy" to confirm infrastructure destruction'
+        required: true
+        default: ''
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  destroy-infra:
+    runs-on: ubuntu-latest
+    if: github.event.inputs.confirm == 'destroy'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: ${{ secrets.TF_VERSION }}
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.PROJECT_NAME }}-github-actions
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Stop ECS service for faster cleanup
+      run: |
+        aws ecs update-service \
+          --cluster ${{ secrets.PROJECT_NAME }}-cluster \
+          --service ${{ secrets.PROJECT_NAME }}-service \
+          --desired-count 0 || echo "ECS service not found or already stopped"
+        sleep 30
+
+    - name: Terraform Init
+      run: |
+        cd terraform
+        terraform init
+
+    - name: Terraform Destroy
+      run: |
+        cd terraform
+        terraform destroy -auto-approve
+
+    - name: Verify ECR cleanup
+      run: |
+        aws ecr describe-repositories --repository-names ${{ secrets.PROJECT_NAME }} || echo "✅ ECR repository cleaned up"
+
+    - name: Cleanup confirmation
+      run: |
+        echo "🗑️ Infrastructure destroyed successfully!"
+        echo "💰 AWS resources have been cleaned up to avoid charges"
