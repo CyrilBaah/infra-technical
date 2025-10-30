@@ -56,5 +56,5 @@ jobs:
 
     - name: Cleanup confirmation
       run: |
-        echo "🗑️ Infrastructure destroyed successfully!"
-        echo "💰 AWS resources have been cleaned up to avoid charges"
+        echo "Infrastructure destroyed successfully!"
+        echo "AWS resources have been cleaned up to avoid charges"
