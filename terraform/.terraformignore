@@ -1,0 +1,58 @@
+# Terraform local files and state
+*.tfstate
+*.tfstate.*
+crash.log
+override.tf
+override.tf.json
+*.override.tf
+*.override.tf.json
+terraform.tfvars
+terraform.tfvars.json
+
+# Terraform directories
+.terraform/
+.terraform.tfstate
+.terraform.tfstate.backup
+
+# Environment or local setup files
+.env
+.env.*
+*.bak
+*.backup
+*.tmp
+*.swp
+.DS_Store
+
+# IDE / editor files
+.vscode/
+.idea/
+*.iml
+
+# Build / deployment artifacts
+__pycache__/
+*.zip
+*.tar.gz
+*.tgz
+*.log
+*.out
+
+# Node, Python, or Docker build files (if present)
+node_modules/
+dist/
+build/
+.venv/
+venv/
+.envrc
+docker-compose.override.yml
+
+# GitHub / CI specific
+.github/
+.git/
+.gitignore
+
+# Any credentials or config (never commit!)
+aws_credentials
+secrets.*
+*.pem
+*.key
+*.crt
