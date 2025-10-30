@@ -1,10 +1,10 @@
-name: Bootstrap GitHub OIDC
+name: Bootstrap Infrastructure
 
 on:
   workflow_dispatch:
     inputs:
       confirm:
-        description: 'Type "bootstrap" to create GitHub OIDC role'
+        description: 'Type "bootstrap" to create S3 backend and GitHub OIDC'
         required: true
         default: ''
 
@@ -23,7 +23,7 @@ jobs:
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
       with:
-        terraform_version: ${{ secrets.TF_VERSION }}
+        terraform_version: 1.5.0
 
     - name: Configure AWS credentials (temporary)
       uses: aws-actions/configure-aws-credentials@v4
@@ -32,18 +32,22 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
-    - name: Create GitHub OIDC role only
+    - name: Bootstrap S3 backend and OIDC
       run: |
-        cd terraform
+        cd bootstrap
         terraform init
-        terraform apply -target=module.github_oidc -auto-approve
+        terraform plan
+        terraform apply -auto-approve
 
-    - name: Show GitHub OIDC role info
+    - name: Show bootstrap info
       run: |
-        cd terraform
+        cd bootstrap
+        S3_BUCKET=$(terraform output -raw s3_bucket_name)
         ROLE_ARN=$(terraform output -raw github_actions_role_arn)
-        echo "GitHub OIDC role created!"
-        echo "Role ARN: ${ROLE_ARN//${{ secrets.AWS_ACCOUNT_ID }}/***MASKED***}"
+        
+        echo "Bootstrap complete!"
+        echo "S3 Bucket: $S3_BUCKET"
+        echo "GitHub Role ARN: ${ROLE_ARN//${{ secrets.AWS_ACCOUNT_ID }}/***MASKED***}"
         echo ""
-        echo "IMPORTANT: Remove AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY secrets after this step!"
-        echo "Now you can use the create_infra.yml workflow with OIDC"
+        echo "IMPORTANT: Remove AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY secrets now!"
+        echo "All future workflows will use OIDC authentication"
