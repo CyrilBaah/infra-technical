@@ -13,3 +13,9 @@ variable "create_oidc_provider" {
   type        = bool
   default     = false
 }
+
+variable "create_github_role" {
+  description = "Whether to create GitHub role (true) or use existing (false)"
+  type        = bool
+  default     = false
+}

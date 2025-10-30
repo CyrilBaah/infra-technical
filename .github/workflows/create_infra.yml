@@ -24,18 +24,33 @@ jobs:
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
       with:
-        terraform_version: ${{ secrets.TF_VERSION }}
+        terraform_version: 1.5.0
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
         role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/hello-api-github-actions
-        aws-region: ${{ secrets.AWS_REGION }}
+        aws-region: eu-west-1
 
     - name: Terraform Init
       run: |
         cd terraform
         terraform init
+
+    - name: Import existing resources
+      run: |
+        cd terraform
+        echo "Importing existing resources if they exist..."
+        
+        # Import ECR repository
+        terraform import module.ecr.aws_ecr_repository.app hello-api 2>/dev/null || echo "ECR not found or already imported"
+        
+        # Import CloudWatch log group
+        terraform import module.ecs.aws_cloudwatch_log_group.app /aws/ecs/hello-api 2>/dev/null || echo "Log group not found or already imported"
+        
+        # Import IAM roles
+        terraform import module.ecs.aws_iam_role.ecs_task_execution hello-api-ecs-task-execution 2>/dev/null || echo "Task execution role not found or already imported"
+        terraform import module.ecs.aws_iam_role.ecs_task hello-api-ecs-task 2>/dev/null || echo "Task role not found or already imported"
 
     - name: Terraform Plan
       run: |
