@@ -1,4 +1,4 @@
-# Infra Technical
+# Deploying a Containerised API on AWS ECS Using Terraform via Github Actions
 
 ## Solution Overview
 
