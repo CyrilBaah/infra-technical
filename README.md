@@ -12,6 +12,9 @@ This repository contains a containerized API built with fast api. The solution d
 - **Terraform** for Infrastructure as Code
 - **GitHub Actions** with OIDC authentication for CI/CD
 
+### Architectural Diagram
+![Architecture Diagram](Diagram.png)
+
 ## 🚀 Setup and Deploy Instructions
 
 ### Step 1: Configure GitHub Secrets
